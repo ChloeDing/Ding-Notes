@@ -1,56 +1,52 @@
 # Ding-Notes
 
-Mock static methods
-We can use PowerMock to mock static methods. In this section we will see how we can mock a static method using PowerMock. We will use java.util.UUID class for this. A UUID represents an immutable universally unique identifier (128 bit value). More details about this class can be found here: UUID Java Docs. In this class there is a method called randomUUID(). It is used to retrieve a type 4 (pseudo randomly generated) UUID. The UUID is generated using a cryptographically strong pseudo random number generator.
+### Mock static methods
+
+We can use **PowerMock** to mock static methods. In this section we will see how we can mock a static method using PowerMock. We will use java.util.UUID class for this. A UUID represents an immutable universally unique identifier (128 bit value). More details about this class can be found here: UUID Java Docs. In this class there is a method called randomUUID(). It is used to retrieve a type 4 (pseudo randomly generated) UUID. The UUID is generated using a cryptographically strong pseudo random number generator.
 We will create a simple method in the UserController class to create random user id.
-1
+```
 public String createUserId(User user) {
-2
   return String.format("%s_%s", user.getSurname(), UUID.randomUUID().toString());
-3
 }
-To tests this we will create a new test method in the UserControllerTest class.
-1
+// To tests this we will create a new test method in the UserControllerTest class.
 @Test
-2
 public void testMockStatic() throws Exception {
-3
   PowerMock.mockStaticPartial(UUID.class, "randomUUID");
-4
   EasyMock.expect(UUID.randomUUID()).andReturn(UUID.fromString("067e6162-3b6f-4ae2-a171-2470b63dff00"));
-5
   PowerMock.replayAll();
-6
   UserController userController = new UserController();
-7
   Assert.assertTrue(userController.createUserId(getNewUser()).contains("067e6162-3b6f-4ae2-a171-2470b63dff00"));
-8
   PowerMock.verifyAll();
-9
 }
+```
 First we will call the mockStaticPartial() method of the org.powermock.api.easymock.PowerMock class passing the class and the static method name as string which we want to mock:
-1
+```
 PowerMock.mockStaticPartial(UUID.class, "randomUUID");
+```
 Then we will define the expectation by calling the expect method of EasyMock and returning the test value of the random UUID.
-1
+```
 EasyMock.expect(UUID.randomUUID()).andReturn(UUID.fromString("067e6162-3b6f-4ae2-a171-2470b63dff00"));
+```
 Now we will call the replayAll() method of PowerMock.
-1
+```
 PowerMock.replayAll();
-It replays all classes and mock objects known by PowerMock. This includes all classes that are prepared for test using the PrepareForTest or PrepareOnlyThisForTest annotations and all classes that have had their static initializers removed by using the SuppressStaticInitializationFor annotation. It also includes all mock instances created by PowerMock such as those created or used by createMock(Class, Method...), mockStatic(Class, Method...), expectNew(Class, Object...), createPartialMock(Class, String...) etc.
+```
+It replays all classes and mock objects known by **PowerMock**. This includes all classes that are prepared for test using the `PrepareForTest` or `PrepareOnlyThisForTest` annotations and all classes that have had their static initializers removed by using the `SuppressStaticInitializationFor` annotation. It also includes all mock instances created by PowerMock such as those created or used by createMock(Class, Method...), mockStatic(Class, Method...), expectNew(Class, Object...), createPartialMock(Class, String...) etc.
 
 To make it easy to pass in additional mocks not created by the PowerMock API you can optionally specify them as additionalMocks. These are typically those mock objects you have created using pure EasyMock or EasyMock class extensions. No additional mocks needs to be specified if you’re only using PowerMock API methods. The additionalMocks are also automatically verified when invoking the verifyAll() method.
 Now we will call the createUserId() method of the UserController class by passing in the test user details.
-1
+```
 Assert.assertTrue(userController.createUserId(getNewUser()).contains("067e6162-3b6f-4ae2-a171-2470b63dff00"));
+```
 In the end we will call the verifyAll()
-1
+```
 PowerMock.verifyAll();
-It verifies all classes and mock objects known by PowerMock. This includes all classes that are prepared for test using the PrepareForTest or PrepareOnlyThisForTest annotations and all classes that have had their static initializers removed by using the SuppressStaticInitializationFor annotation. It also includes all mock instances created by PowerMock such as those created or used by createMock(Class, Method...), mockStatic(Class, Method...), expectNew(Class, Object...), createPartialMock(Class, String...) etc. Note that all additionalMocks passed to the replayAll(Object...) method are also verified here automatically.
+```
+It verifies all classes and mock objects known by PowerMock. This includes all classes that are prepared for test using the `PrepareForTest` or `PrepareOnlyThisForTest` annotations and all classes that have had their static initializers removed by using the `SuppressStaticInitializationFor` annotation. It also includes all mock instances created by PowerMock such as those created or used by `createMock(Class, Method...), mockStatic(Class, Method...), expectNew(Class, Object...), createPartialMock(Class, String...)` etc. Note that all additionalMocks passed to the `replayAll(Object...)` method are also verified here automatically.
 
 
 
-6. Mock private methods
+### Mock private methods
 In this section we will see how we can mock a private method using PowerMock. It’s a very useful feature which uses java reflection. We will define a public method in out UserController class as below:
 1
 public String getGreetingText(User user) {
