@@ -618,30 +618,31 @@ CREATE FUNCTION DurationDaysCalculator(start_date TIMESTAMP, end_date TIMESTAMP,
 DELIMITER ;
 ```
 
-### some git stash
+### Some git stash
 ```
 git stash list [<options>]
 git stash show [<stash>]
 git stash drop [-q|--quiet] [<stash>]
 ```
 
-### Java DateFormat styles:
+### Java DateFormat Styles:
 The preceding code example specified the DEFAULT formatting style. The DEFAULT style is just one of the predefined formatting styles that the DateFormat class provides, as follows:
-	•	DEFAULT
-	•	SHORT
-	•	MEDIUM
-	•	LONG
-	•	FULL
+
+* DEFAULT
+* SHORT
+* MEDIUM
+* LONG
+* FULL
+
 The following table shows how dates are formatted for each style with the U.S. and French locales:
 Sample Date Formats
-
+```
 dateFormatter = DateFormat.getDateInstance(DateFormat.DEFAULT, currentLocale);
-
-
-
-certificateListComboBox.setCaption(
-                "<font size=\"5\">Please choose a certificate that you would like to submit:</font>");
-        certificateListComboBox.setCaptionAsHtml(true);
+```
+```
+certificateListComboBox.setCaption("<font size=\"5\">Please choose a certificate that you would like to submit:</font>");
+certificateListComboBox.setCaptionAsHtml(true);
+```
 
 ```
 select MAX(cd.`updated_at`), cd.`guid`, cd.`CERTIFICATION_TYPE_GUID`, cd.`status` from certification_data cd WHERE cd.`CREATED_BY_ID` = 392   GROUP BY cd.`CERTIFICATION_TYPE_GUID`;
