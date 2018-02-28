@@ -141,7 +141,7 @@ Volatile makes the multi threads or multi cores to have one single instance of t
 
 As of J2SE 5.0, this problem has been fixed. The volatile keyword now ensures that multiple threads handle the singleton instance correctly. This new idiom is described in [4] and [5].
 
-
+```
 // Works with acquire/release semantics for volatile in Java 1.5 and later
 // Broken under Java 1.4 and earlier semantics for volatile
 class Foo {
@@ -161,7 +161,7 @@ class Foo {
 
     // other functions and members...
 }
-
+```
 
 ### When to use AtomicReference in Java?
 https://stackoverflow.com/questions/3964211/when-to-use-atomicreference-in-java
@@ -253,7 +253,7 @@ $ sed -i 's/cat/dog/' file.txt
 $ awk '{print $2}' file.txt
 # this will print the second column of file.txt
 ```
-Basic awk usage: Compute sum/average/max/min/etc. what ever you may need. 
+Basic awk usage: **Compute sum/average/max/min/etc. what ever you may need.**
 ```
 $ cat file.txt
 A 10
@@ -483,17 +483,18 @@ select er.`start_date` AS `start date`, er.end_date AS `end date`, CONCAT(em.`fi
 ### The difference between Procedure and Function in MySQL?
 
 The most general difference between procedures and functions is that they are invoked differently and for different purposes:
-	1.	A procedure does not return a value. Instead, it is invoked with a CALL statement to perform an operation such as modifying a table or processing retrieved records.
-	2.	A function is invoked within an expression and returns a single value directly to the caller to be used in the expression.
-	3.	You cannot invoke a function with a CALL statement, nor can you invoke a procedure in an expression.
+** A procedure does not return a value. Instead, it is invoked with a CALL statement to perform an operation such as modifying a table or processing retrieved records.
+** A function is invoked within an expression and returns a single value directly to the caller to be used in the expression.
+** You cannot invoke a function with a CALL statement, nor can you invoke a procedure in an expression.
 
 Syntax for routine creation differs somewhat for procedures and functions:
-	1.	Procedure parameters can be defined as input-only, output-only, or both. This means that a procedure can pass values back to the caller by using output parameters. These values can be accessed in statements that follow the CALL statement. Functions have only input parameters. As a result, although both procedures and functions can have parameters, procedure parameter declaration differs from that for functions.
-	2.	Functions return value, so there must be a RETURNS clause in a function definition to indicate the data type of the return value. Also, there must be at least one RETURN statement within the function body to return a value to the caller. RETURNS and RETURN do not appear in procedure definitions.
-	•	To invoke a stored procedure, use the CALL statement. To invoke a stored function, refer to it in an expression. The function returns a value during expression evaluation. 
-	•	A procedure is invoked using a CALL statement, and can only pass back values using output variables. A function can be called from inside a statement just like any other function (that is, by invoking the function's name), and can return a scalar value. 
-	•	Specifying a parameter as IN, OUT, or INOUT is valid only for a PROCEDURE. For a FUNCTION, parameters are always regarded as IN parameters. 
-	3.	If no keyword is given before a parameter name, it is an IN parameter by default. Parameters for stored functions are not preceded by IN, OUT, or INOUT. All function parameters are treated as IN parameters. 
+** Procedure parameters can be defined as input-only, output-only, or both. This means that a procedure can pass values back to the caller by using output parameters. These values can be accessed in statements that follow the CALL statement. Functions have only input parameters. As a result, although both procedures and functions can have parameters, procedure parameter declaration differs from that for functions.
+** Functions return value, so there must be a RETURNS clause in a function definition to indicate the data type of the return value. Also, there must be at least one RETURN statement within the function body to return a value to the caller. RETURNS and RETURN do not appear in procedure definitions.
+** To invoke a stored procedure, use the CALL statement. To invoke a stored function, refer to it in an expression. The function returns a value during expression evaluation. 
+** A procedure is invoked using a CALL statement, and can only pass back values using output variables. A function can be called from inside a statement just like any other function (that is, by invoking the function's name), and can return a scalar value.
+** **Specifying a parameter as IN, OUT, or INOUT is valid only for a PROCEDURE. For a FUNCTION, parameters are always regarded as IN parameters.**
+** **If no keyword is given before a parameter name, it is an IN parameter by default. Parameters for stored functions are not preceded by IN, OUT, or INOUT. All function parameters are treated as IN parameters.**
+
 To define a stored procedure or function, use CREATE PROCEDURE or CREATE FUNCTION respectively:
 ```
 CREATE PROCEDURE proc_name ([parameters])
@@ -516,15 +517,22 @@ In Stored procedures dynamic SQL can be used but not in functions or triggers.
 SQL prepared statements (PREPARE, EXECUTE, DEALLOCATE PREPARE) can be used in stored procedures, but not stored functions or triggers. Thus, stored functions and triggers cannot use Dynamic SQL (where you construct statements as strings and then execute them). (Dynamic SQL in MySQL stored routines)
 
 ### Some more interesting differences between FUNCTION and STORED PROCEDURE:
-	1.	(This point is copied from a blogpost.) Stored procedure is precompiled execution plan where as functions are not. Function Parsed and compiled at runtime. Stored procedures, Stored as a pseudo-code in database i.e. compiled form. 
-	2.	(I'm not sure for this point.) Stored procedure has the security and reduces the network traffic and also we can call stored procedure in any no. of applications at a time. reference 
-	3.	Functions are normally used for computations where as procedures are normally used for executing business logic. 
-	4.	Functions Cannot affect the state of database (Statements that do explicit or implicit commit or rollback are disallowed in function) Whereas Stored procedures Can affect the state of database using commit etc. refrence: J.1. Restrictions on Stored Routines and Triggers 
-	5.	Functions can't use FLUSH statements whereas Stored procedures can do. 
-	6.	Stored functions cannot be recursive Whereas Stored procedures can be. Note: Recursive stored procedures are disabled by default, but can be enabled on the server by setting the max_sp_recursion_depth server system variable to a nonzero value. See Section 5.2.3, “System Variables”, for more information. 
-	7.	Within a stored function or trigger, it is not permitted to modify a table that is already being used (for reading or writing) by the statement that invoked the function or trigger. Good Example: How to Update same table on deletion in MYSQL? 
+
+1. (This point is copied from a blogpost.) Stored procedure is precompiled execution plan where as functions are not. Function Parsed and compiled at runtime. Stored procedures, Stored as a pseudo-code in database i.e. compiled form.
+
+2. (I'm not sure for this point.)**Stored procedure has the security and reduces the network traffic and also we can call stored procedure in any no. of applications at a time. reference**
+
+3. Functions are normally used for computations where as procedures are normally used for executing business logic.
+
+4. Functions Cannot affect the state of database (Statements that do explicit or implicit commit or rollback are disallowed in function) Whereas Stored procedures Can affect the state of database using commit etc. refrence: J.1. Restrictions on Stored Routines and Triggers
+
+5. Functions can't use FLUSH statements whereas Stored procedures can do.
+
+6. Stored functions cannot be recursive Whereas Stored procedures can be. Note: Recursive stored procedures are disabled by default, but can be enabled on the server by setting the max_sp_recursion_depth server system variable to a nonzero value. See Section 5.2.3, “System Variables”, for more information.
+
+7. Within a stored function or trigger, it is not permitted to modify a table that is already being used (for reading or writing) by the statement that invoked the function or trigger. Good Example: How to Update same table on deletion in MYSQL?
 	
-Note: that although some restrictions normally apply to stored functions and triggers but not to stored procedures, those restrictions do apply to stored procedures if they are invoked from within a stored function or trigger. For example, although you can use FLUSH in a stored procedure, such a stored procedure cannot be called from a stored function or trigger.
+**Note**: that although some restrictions normally apply to stored functions and triggers but not to stored procedures, those restrictions do apply to stored procedures if they are invoked from within a stored function or trigger. For example, although you can use FLUSH in a stored procedure, such a stored procedure cannot be called from a stored function or trigger.
 
 ```
 DELIMITER //
@@ -602,9 +610,11 @@ DELIMITER ;
 ```
 
 ### some git stash
+```
 git stash list [<options>]
 git stash show [<stash>]
 git stash drop [-q|--quiet] [<stash>]
+```
 
 ### Java DateFormat styles:
 The preceding code example specified the DEFAULT formatting style. The DEFAULT style is just one of the predefined formatting styles that the DateFormat class provides, as follows:
