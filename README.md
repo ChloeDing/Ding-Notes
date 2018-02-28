@@ -794,3 +794,45 @@ GROUP BY cd.guid
 ORDER BY ISNULL(`Expires On`) ASC, `Expires On` ASC, ct.name ASC;
 ```
 
+### How to Add One Day to a Date?
+Given a Date dt you have several possibilities:
+
+**Solution 1: You can use the Calendar class for that:
+```
+Date dt = new Date();
+Calendar c = Calendar.getInstance(); 
+c.setTime(dt); 
+c.add(Calendar.DATE, 1);
+dt = c.getTime();
+```
+**Solution 2: You should seriously consider using the Joda-Time library, because of the various shortcomings of the Date class. With Joda-Time you can do the following:**
+```
+Date dt = new Date();
+DateTime dtOrg = new DateTime(dt);
+DateTime dtPlusOne = dtOrg.plusDays(1);
+```
+**Solution 3: With Java 8 you can also use the new JSR 310 API (which is inspired by Joda-Time):**
+```
+LocalDateTime.from(dt.toInstant()).plusDays(1);
+```
+
+### Calendar.getInstance(TimeZone.getTimeZone(“UTC”)) is not returning UTC time
+[Resource From](https://stackoverflow.com/questions/21349475/calendar-getinstancetimezone-gettimezoneutc-is-not-returning-utc-time)
+The `System.out.println(cal_Two.getTime())` invocation returns a Date from getTime(). It is the Date which is getting converted to a string for println, and that conversion will use the default IST timezone in your case.
+
+You'll need to explicitly use DateFormat.setTimeZone() to print the Date in the desired timezone.
+```
+TimeZone timeZone = TimeZone.getTimeZone("UTC");
+Calendar calendar = Calendar.getInstance(timeZone);
+SimpleDateFormat simpleDateFormat = 
+       new SimpleDateFormat("EE MMM dd HH:mm:ss zzz yyyy", Locale.US);
+simpleDateFormat.setTimeZone(timeZone);
+
+System.out.println("Time zone: " + timeZone.getID());
+System.out.println("default time zone: " + TimeZone.getDefault().getID());
+System.out.println();
+
+System.out.println("UTC:     " + simpleDateFormat.format(calendar.getTime()));
+System.out.println("Default: " + calendar.getTime());
+```
+
