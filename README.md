@@ -797,7 +797,7 @@ ORDER BY ISNULL(`Expires On`) ASC, `Expires On` ASC, ct.name ASC;
 ### How to Add One Day to a Date?
 Given a Date dt you have several possibilities:
 
-**Solution 1: You can use the Calendar class for that:
+**Solution 1: You can use the Calendar class for that:**
 ```
 Date dt = new Date();
 Calendar c = Calendar.getInstance(); 
