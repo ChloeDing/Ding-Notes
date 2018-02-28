@@ -483,17 +483,26 @@ select er.`start_date` AS `start date`, er.end_date AS `end date`, CONCAT(em.`fi
 ### The difference between Procedure and Function in MySQL?
 
 The most general difference between procedures and functions is that they are invoked differently and for different purposes:
-** A procedure does not return a value. Instead, it is invoked with a CALL statement to perform an operation such as modifying a table or processing retrieved records.
-** A function is invoked within an expression and returns a single value directly to the caller to be used in the expression.
-** You cannot invoke a function with a CALL statement, nor can you invoke a procedure in an expression.
+
+1. A procedure does not return a value. Instead, it is invoked with a CALL statement to perform an operation such as modifying a table or processing retrieved records.
+
+2. A function is invoked within an expression and returns a single value directly to the caller to be used in the expression.
+
+3. You cannot invoke a function with a CALL statement, nor can you invoke a procedure in an expression.
 
 Syntax for routine creation differs somewhat for procedures and functions:
-** Procedure parameters can be defined as input-only, output-only, or both. This means that a procedure can pass values back to the caller by using output parameters. These values can be accessed in statements that follow the CALL statement. Functions have only input parameters. As a result, although both procedures and functions can have parameters, procedure parameter declaration differs from that for functions.
-** Functions return value, so there must be a RETURNS clause in a function definition to indicate the data type of the return value. Also, there must be at least one RETURN statement within the function body to return a value to the caller. RETURNS and RETURN do not appear in procedure definitions.
-** To invoke a stored procedure, use the CALL statement. To invoke a stored function, refer to it in an expression. The function returns a value during expression evaluation. 
-** A procedure is invoked using a CALL statement, and can only pass back values using output variables. A function can be called from inside a statement just like any other function (that is, by invoking the function's name), and can return a scalar value.
-** **Specifying a parameter as IN, OUT, or INOUT is valid only for a PROCEDURE. For a FUNCTION, parameters are always regarded as IN parameters.**
-** **If no keyword is given before a parameter name, it is an IN parameter by default. Parameters for stored functions are not preceded by IN, OUT, or INOUT. All function parameters are treated as IN parameters.**
+
+1. Procedure parameters can be defined as input-only, output-only, or both. This means that a procedure can pass values back to the caller by using output parameters. These values can be accessed in statements that follow the CALL statement. Functions have only input parameters. As a result, although both procedures and functions can have parameters, procedure parameter declaration differs from that for functions.
+
+2. Functions return value, so there must be a RETURNS clause in a function definition to indicate the data type of the return value. Also, there must be at least one RETURN statement within the function body to return a value to the caller. RETURNS and RETURN do not appear in procedure definitions.
+
+3. To invoke a stored procedure, use the CALL statement. To invoke a stored function, refer to it in an expression. The function returns a value during expression evaluation.
+
+4. A procedure is invoked using a CALL statement, and can only pass back values using output variables. A function can be called from inside a statement just like any other function (that is, by invoking the function's name), and can return a scalar value.
+
+5. **Specifying a parameter as IN, OUT, or INOUT is valid only for a PROCEDURE. For a FUNCTION, parameters are always regarded as IN parameters.**
+
+6. **If no keyword is given before a parameter name, it is an IN parameter by default. Parameters for stored functions are not preceded by IN, OUT, or INOUT. All function parameters are treated as IN parameters.**
 
 To define a stored procedure or function, use CREATE PROCEDURE or CREATE FUNCTION respectively:
 ```
