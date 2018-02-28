@@ -48,52 +48,41 @@ It verifies all classes and mock objects known by PowerMock. This includes all c
 
 ### Mock private methods
 In this section we will see how we can mock a private method using PowerMock. It’s a very useful feature which uses java reflection. We will define a public method in out UserController class as below:
-1
+```
 public String getGreetingText(User user) {
-2
   return String.format(getGreetingFormat(), user.getFirstName(), user.getSurname());
-3
 }
-As we can see that this method calls a private method getGreetingFormat(), which is defined as below:
-1
+// As we can see that this method calls a private method getGreetingFormat(), which is defined as below:
 private String getGreetingFormat() {
-2
   return "Hello %s %s";
-3
 }
+```
 We will try to change the behavior of this private method using PowerMock.
-You can create spies of real objects. When you use the spy then the real methods are called (unless a method was stubbed). Spying on real objects can be associated with “partial mocking” concept. We will first create a spy on the UserController class.
-1
+You can create **spies** of real objects. When you use the spy then the real methods are called (unless a method was stubbed). Spying on real objects can be associated with “partial mocking” concept. We will first create a spy on the `UserController` class.
+```
 UserController spy = spy(new UserController());
+```
 Then we will define how the private method should behave when it’s been called by using org.powermock.api.mockito.PowerMockito.when.
-1
+```
 when(spy, method(UserController.class, "getGreetingFormat")).withNoArguments().thenReturn("Good Morning %s %s");
+```
 Now we will call the public method (which uses the private method) on the spied object
-1
+```
 assertEquals("Good Morning Code Geeks", spy.getGreetingText(user));
+```
 Below is the code snippet of the whole method
-view source
-print
-?
-1
+```
 @Test
-2
 public void testMockPrivateMethod() throws Exception {
-3
   UserController spy = spy(new UserController());
-4
   when(spy, method(UserController.class, "getGreetingFormat")).withNoArguments().thenReturn("Good Morning %s %s");
-5
   User user = new User();
-6
   user.setFirstName("Code");
-7
   user.setSurname("Geeks");
-8
   assertEquals("Good Morning Code Geeks", spy.getGreetingText(user));
-9
 }
-https://examples.javacodegeeks.com/core-java/powermockito/powermockito-tutorial-beginners/
+```
+Reference from: https://examples.javacodegeeks.com/core-java/powermockito/powermockito-tutorial-beginners/
 
 
 Based on the docs, you're not using this correctly:https://github.com/powermock/powermock/wiki/MockitoUsage
@@ -104,8 +93,7 @@ From the docs:
 
 https://stackoverflow.com/questions/41287948/org-mockito-exceptions-misusing-missingmethodinvocationexception-when-require
 
-
-
+```
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ IVWConfigurationLoader.class })
 public class NotificationFacadeTest {
@@ -133,30 +121,21 @@ public class NotificationFacadeTest {
         Assert.assertTrue(result.isEmpty());
     }
 }
+```
 
-
-What is AtomicReference?
+### What is AtomicReference?
 http://a-developers-notes.blogspot.ca/2012/03/what-is-atomicreference-for-really.html
 http://tutorials.jenkov.com/java-util-concurrent/atomicreference.html
 Best atomic reference explanation
 
-
-
-stevechy [2:30 PM] 
+### Double-checked locking
 https://en.wikipedia.org/wiki/Double-checked_locking
 
-Wikipedia
-Double-checked locking
-
-In software engineering, double-checked locking (also known as "double-checked locking optimization") is a software design pattern used to reduce the overhead of acquiring a lock by first testing the locking criterion (the "lock hint") without actually acquiring the lock. Only if the locking criterion check indicates that locking is required does the actual locking logic proceed.
+In software engineering, double-checked locking (also known as "double-checked locking optimization") is a **software design pattern** used to reduce the overhead of acquiring a lock by first testing the locking criterion (the "lock hint") without actually acquiring the lock. Only if the locking criterion check indicates that locking is required does the actual locking logic proceed.
 The pattern, when implemented in some language/hardware combinations, can be unsafe. At times, it can be considered an Show more…
 
-
-[2:34] 
 “One of the dangers of using double-checked locking in J2SE 1.4 (and earlier versions) is that it will often appear to work: it is not easy to distinguish between a correct implementation of the technique and one that has subtle problems. Depending on the compiler, the interleaving of threads by the scheduler and the nature of other concurrent system activity, failures resulting from an incorrect implementation of double-checked locking may only occur intermittently. Reproducing the failures can be difficult.”
 
-
-[2:35] 
 “As of J2SE 5.0, this problem has been fixed. The volatile keyword now ensures that multiple threads handle the singleton instance correctly. ”
 Volatile makes the multi threads or multi cores to have one single instance of the variable and each thread is just having a reference to that variable, so once the variable is changed, the cache inside each thread is surely changed. So, instead of storing the variable’s value, the threads are only storing the variable’s reference.
 
@@ -184,12 +163,10 @@ class Foo {
 }
 
 
-When to use AtomicReference in Java?
+### When to use AtomicReference in Java?
 https://stackoverflow.com/questions/3964211/when-to-use-atomicreference-in-java
-up vote
-down vote
-accepted
-Atomic reference should be used in a setting where you need to do simple atomic (i.e., thread safe, non-trivial) operations on a reference, for which monitor-based synchronization is not appropriate. Suppose you want to check to see if a specific field only if the state of the object remains as you last checked:
+**Atomic reference** should be used in a setting where you need to do simple atomic (i.e., thread safe, non-trivial) operations on a reference, for which monitor-based synchronization is not appropriate. Suppose you want to check to see if a specific field only if the state of the object remains as you last checked:
+```
 AtomicReference<Object> cache = new AtomicReference<Object>();
 
 Object cachedValue = new Object();
@@ -200,10 +177,15 @@ Object cachedValueToUpdate = cache.get();
 //... do some work to transform cachedValueToUpdate into a new version
 Object newValue = someFunctionOfOld(cachedValueToUpdate);
 boolean success = cache.compareAndSet(cachedValue,cachedValueToUpdate);
+```
 Because of the atomic reference semantics, you can do this even if the cache object is shared amongst threads, without using synchronized. In general, you're better off using synchronizers or the java.util.concurrent framework rather than bare Atomic* unless you know what you're doing.
-Two excellent dead-tree references which will introduce you to this topic: Herlihy's excellent Art of Multiprocessor Programming and Java Concurrency in Practice.
+
+Two excellent dead-tree references which will introduce you to this topic: **Herlihy's excellent Art of Multiprocessor Programming and Java Concurrency in Practice**.
+
 Note that (I don't know if this has always been true) reference assignment (i.e., =) is itself atomic (updating primitive 64-bit types(long/double) may not be atomic; but updating a reference is always atomic, even if it's 64 bit) without explicitly using an Atomic*. See the JLS 3ed, Section 17.7, …
-To use an AtomicReference:
+
+### To use an AtomicReference:
+```
 public static AtomicReference<String> shared = new AtomicReference<>();
 String init="Inital Value";
 shared.set(init);
@@ -216,29 +198,33 @@ while(!success){
   // Compare and set
   success=shared.compareAndSet(prevValue,newValue);
 }
+```
 Now why is this better? Honestly that code is a little less clean than before. But there is something really important that happens under the hood in AtomicRefrence, and that is compare and swap. It is a single CPU instruction, not an OS call, that makes the switch happen. That is a single instruction on the CPU. And because there are no locks, there is no context switch in the case where the lock gets exercised which saves even more time!
+
 The catch is, for AtomicReferences, this does not use a .equals() call, but instead an == comparison for the expected value. So make sure the expected is the actual object returned from get in the loop.
 
-up vote
-down vote
-SimpleDateFormat stores intermediate results in instance fields. So if one instance is used by two threads they can mess each other's results.
+### SimpleDateFormat
+SimpleDateFormat stores **intermediate** results in instance fields. So if one instance is used by two threads they can mess each other's results.
+
 Looking at the source code reveals that there is a Calendar instance field, which is used by operations on DateFormat / SimpleDateFormat
+
 For example parse(..) calls calendar.clear() initially and then calendar.add(..). If another thread invokes parse(..) before the completion of the first invocation, it will clear the calendar, but the other invocation will expect it to be populated with intermediate results of the calculation.
-One way to reuse date formats without trading thread-safety is to put them in a ThreadLocal - some libraries do that. That's if you need to use the same format multiple times within one thread. But in case you are using a servlet container (that has a thread pool), remember to clean the thread-local after you finish.
-To be honest, I don't understand why they need the instance field, but that's the way it is. You can also use joda-time DateTimeFormat which is threadsafe.
+
+One way to **reuse date formats** without trading **thread-safety** is to put them in a **ThreadLocal** - some libraries do that. That's if you need to use the same format multiple times within one thread. But in case you are using a servlet container (that has a thread pool), remember to clean the thread-local after you finish.
+To be honest, I don't understand why they need the instance field, but that's the way it is. You can also use `jodatime DateTimeFormat` which is **threadsafe**.
 https://stackoverflow.com/questions/6840803/why-is-javas-simpledateformat-not-thread-safe
 
-
-You need
-test.split("\\|");
+### regex
+You need `test.split("\\|")`;
 split uses regular expression and in regex | is a metacharacter representing the OR operator. You need to escape that character using \ (written in String as "\\" since \ is also a metacharacter in String literals and require another \ to escape it).
-You can also use
-test.split(Pattern.quote("|"));
-and let Pattern.quote create the escaped version of the regex representing |.
 
-differences among grep, awk and sed [duplicate]
+You can also use `test.split(Pattern.quote("|"));`
+and let `Pattern.quote` create the escaped version of the regex representing |.
+
+### differences among grep, awk and sed [duplicate]
 Short definition:
 grep: search for specific terms in a file
+```
 #usage
 $ grep This file.txt
 Every line containing "This"
@@ -252,28 +238,37 @@ Every line containing "This"
 Every line containing "That"
 Every line containing "This"
 Every line containing "This"
-Now awk and sed are completly different than grep. awk and sed are text processors. Not only do they have the ability to find what you are looking for in text, they have the ability to remove, add and modify the text as well (and much more).  
-awk is mostly used for data extraction and reporting. sed is a stream editor Each one of them has its own functionality and specialties.
-Example  Sed 
+```
+Now **awk** and **sed** are completly different than grep. awk and sed are **text processors**. Not only do they have the ability to find what you are looking for in text, they have the ability to _remove, add and modify_ the text as well (and much more). 
+
+**awk** is mostly used for _data extraction and reporting_. **sed** is a stream editor. Each one of them has its own functionality and specialties.
+
+Example **Sed**
+```
 $ sed -i 's/cat/dog/' file.txt
 # this will replace any occurrence of the characters 'cat' by 'dog'
-Awk 
+```
+**Awk**
+```
 $ awk '{print $2}' file.txt
 # this will print the second column of file.txt
+```
 Basic awk usage: Compute sum/average/max/min/etc. what ever you may need. 
+```
 $ cat file.txt
 A 10
 B 20
 C 60
 $ awk 'BEGIN {sum=0; count=0; OFS="\t"} {sum+=$2; count++} END {print "Average:", sum/count}' file.txt
 Average:    30
-I recommend that you read this book: Sed & Awk: 2nd Ed.
+```
+I recommend that you read this book: <<Sed & Awk: 2nd Ed>>.
 It will help you become a proficient sed/awk user on any unix-like environment.
 
-
+### diff between checkNotNull && @Nonnull
 checkNotNull is ran at runtime but @Nonnull lets intellij idea plugin to detect if a null value is passed (depending to the code) and complain about that (by high lighting that piece of code) :)
 
-
+```
 @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
@@ -315,15 +310,17 @@ checkNotNull is ran at runtime but @Nonnull lets intellij idea plugin to dete
         // Assert
         fail("Expected an exception");
     }
+```
 
-
-
+```
 select guid, count(*) cnt From `integration_import_result` group by 1 having cnt > 1;
 select * From `integration_import_result`;
+```
 
 
+### Vaadin Table Example
 http://www.tnwblog.com/vaadin-table-example.html
-Vaadin Table Example
+```
 //create table instance
     Table table = new Table("My table");
     //add table columns
@@ -337,61 +334,67 @@ Vaadin Table Example
     table.addItem(new Object[]{new Integer(100503), "this is forth", new Date()}, new Integer(4));
     table.addItem(new Object[]{new Integer(100504), "this is fifth", new Date()}, new Integer(5));
     table.addItem(new Object[]{new Integer(100505), "this is sixth", new Date()}, new Integer(6));
+```
 
-
-Guava MultiMap
-Map<String,List<MyClass>> myClassListMap  = new HashMap<String,List<MyClass>>()
-
+### Guava MultiMap
+`Map<String,List<MyClass>> myClassListMap  = new HashMap<String,List<MyClass>>()`
 http://tomjefferys.blogspot.ca/2011/09/multimaps-google-guava.html
+```
 public class MutliMapTest {
-    public static void main(String... args) {
-  Multimap<String, String> myMultimap = ArrayListMultimap.create();
-   
-  // Adding some key/value
-  myMultimap.put("Fruits", "Bannana");
-  myMultimap.put("Fruits", "Apple");
-  myMultimap.put("Fruits", "Pear");
-  myMultimap.put("Vegetables", "Carrot");
-   
-  // Getting the size
-  int size = myMultimap.size();
-  System.out.println(size);  // 4
-   
-  // Getting values
-  Collection<string> fruits = myMultimap.get("Fruits");
-  System.out.println(fruits); // [Bannana, Apple, Pear]
-   
-  Collection<string> vegetables = myMultimap.get("Vegetables");
-  System.out.println(vegetables); // [Carrot]
-   
-  // Iterating over entire Mutlimap
-  for(String value : myMultimap.values()) {
-   System.out.println(value);
-  }
-   
-  // Removing a single value
-  myMultimap.remove("Fruits","Pear");
-  System.out.println(myMultimap.get("Fruits")); // [Bannana, Pear]
-   
-  // Remove all values for a key
-  myMultimap.removeAll("Fruits");
-  System.out.println(myMultimap.get("Fruits")); // [] (Empty Collection!)
- }
+  public static void main(String... args) {
+	  Multimap<String, String> myMultimap = ArrayListMultimap.create();
+
+	  // Adding some key/value
+	  myMultimap.put("Fruits", "Bannana");
+	  myMultimap.put("Fruits", "Apple");
+	  myMultimap.put("Fruits", "Pear");
+	  myMultimap.put("Vegetables", "Carrot");
+
+	  // Getting the size
+	  int size = myMultimap.size();
+	  System.out.println(size);  // 4
+
+	  // Getting values
+	  Collection<string> fruits = myMultimap.get("Fruits");
+	  System.out.println(fruits); // [Bannana, Apple, Pear]
+
+	  Collection<string> vegetables = myMultimap.get("Vegetables");
+	  System.out.println(vegetables); // [Carrot]
+
+	  // Iterating over entire Mutlimap
+	  for(String value : myMultimap.values()) {
+	   System.out.println(value);
+	  }
+
+	  // Removing a single value
+	  myMultimap.remove("Fruits","Pear");
+	  System.out.println(myMultimap.get("Fruits")); // [Bannana, Pear]
+
+	  // Remove all values for a key
+	  myMultimap.removeAll("Fruits");
+	  System.out.println(myMultimap.get("Fruits")); // [] (Empty Collection!)
+  }
 }
+```
 
 
-Arrays.asList VS. new ArrayList<>()
+### Arrays.asList VS. new ArrayList<>()
 When you call Arrays.asList it does not return a java.util.ArrayList. It returns a java.util.Arrays$ArrayList which is an immutable list. You cannot add to it and you cannot remove from it.
+
 If you try to add or remove elements from them you will get UnsupportedOperationException
-In fact, 
-I'll expand my comment a little bit,
-One problem that can occur if you use asList as it wasn't different from ArrayList object:
+In fact, I'll expand my comment a little bit,
+One problem that can occur if you use **asList** as it wasn't different from ArrayList object:
+```
 List list = Arrays.asList(array) ;
 list.remove(0); //UnsupportedOperationException :(
+```
 Here you cannot remove the 0 element because asList returns a fixed-size list backed by the specified array. So you should do something like:
+```
 List newList = new ArrayList(Arrays.asList(array));
+```
 in order to make the newList modifiable.
 
+### SQL DATE DIFF
 SELECT DATEDIFF(‘2008-05-20','2008-05-19');  1 day
 SELECT DATEDIFF(‘2008-05-20','2008-05-20');  0 day
 SELECT DATEDIFF(‘2008-05-18','2008-05-20');  -2 day
@@ -399,22 +402,26 @@ SELECT DATE_SUB("2017-06-15 09:34:21", INTERVAL 15 MINUTE);    2017-06-15 09:19:
 SELECT DATE_SUB("2017-06-15 09:34:21", INTERVAL 3 HOUR); 2017-06-15 06:34:21
 SELECT DATE_SUB("2017-06-15", INTERVAL -2 MONTH); 2017-08-15
 
-select uuid();  — random guid generator
+### select uuid();  — random guid generator
 
+### SQL DATE
+```
 SELECT CURDATE();   2018-01-05
-
 select now();    2018-01-05 16:38:52
-SELECT COALESCE(NULL,1); 
+```
+
+### SELECT COALESCE(NULL,1); 
 Returns the first non-NULL value in the list, or NULL if there are no non-NULL values.
 The return type of COALESCE() is the aggregated type of the argument types.
-Aggregate Functions
+
+### Aggregate Functions (MySQL)
 Some functions, such as SUM, are used to perform calculations on a group of rows, these are called aggregate functions.  In most cases these functions operate on a group of values which are defined using the GROUP BY clause.  When there isn’t a GROUP BY clause, it is generally understood the aggregate function applies to all filtered results.
 Some of the most common aggregate functions include:
 
- 
 These functions can be used on their own on in conjunction with the GROUP BY clause.  On their own, they operate across the entire table; however, when used with GROUP BY, their calculations are “reset” each time the grouping changes.  In this manner they act as subtotals.
 https://www.essentialsql.com/get-ready-to-learn-sql-6-how-to-group-and-summarize-your-results/
 https://docs.thunderstone.com/site/texisman/summarizing_values.html
+```
 select GREATEST('2018-01-04 22:00:00', null);  ->  null
 select LEAST('2018-01-04 22:00:00', null);   -> null
 select LEAST('2018-01-04 22:00:00', ‘2018-01-03');  -> 2018-01-03
@@ -426,8 +433,8 @@ FROM EmployeeRecord er
 LEFT JOIN JobOrder job ON er.`JOB_ORDER_ID` = job.`id` 
 LEFT JOIN Employee em ON er.`EMPLOYEE_ID` = em.`id` 
 WHERE job.`jobNo` = 2853 AND job.`OWNER_GUID` = 'b7c08a16-20c3-4062-9f64-26d1be2b6e21' GROUP BY job.`jobNo`, `Employee`;
-________________
-________________
+```
+```
 INSERT INTO `Report_Entity` (`guid`, `name`, `uname`, `query`, `active`, `showIndexColumn`, `hierarchyColumn`, `createNewRowForHierarhcy`, `owner_id`, `OWNER_GUID`, `isStandalone`, `VIEW_PERMISSION_ID`, `VIEW_PERMISSION_GUID`)
 VALUES
 	('46e65716-f25c-11e7-a03c-bf121c5863e6', 'Employee Longevity Report', 'employee_longevity_report', '', 1, 0, NULL, 1, NULL, 'b7c08a16-20c3-4062-9f64-26d1be2b6e21', 1, NULL, NULL);
@@ -435,7 +442,8 @@ VALUES
 INSERT INTO `Report_Entity_Parameter` (`guid`, `index`, `paramName`, `type`, `title`, `defaultOp`, `defaultVal`, `extra`, `extra2`, `extra3`, `extra4`, `positionInUI`, `requiresNewLine`, `VIEW_PERMISSION_GUID`, `owner_guid`)
 VALUES
 	('23275124-f25f-11e7-a03c-bf121c5863e6', 0, 'job', 'ComboBox', 'Job No.', '', '-1', 'SELECT \'All\' m_key, -1 m_value\n\nUNION\n\n(SELECT jobNo m_key, id m_value FROM JobOrder\nWHERE OWNER_GUID = \'b7c08a16-20c3-4062-9f64-26d1be2b6e21\'\nAND status NOT IN (\'Deleted\', \'Finished\'))\n\nORDER BY m_key DESC;', '', '', '', 'Left', 0, NULL, '46e65716-f25c-11e7-a03c-bf121c5863e6');
-
+```
+```
 SELECT job.jobNo AS `Job No.`, CONCAT(em.`firstName`, ' ', em.`lastName`) AS `Employee`, 
 SUM(DATEDIFF(LEAST(COALESCE(er.`end_date`,CURDATE()), CURDATE()), LEAST(er.`start_date`, CURDATE()))) AS `Duration (Days)`  
 FROM EmployeeRecord er 
@@ -443,108 +451,36 @@ LEFT JOIN JobOrder job ON er.`JOB_ORDER_ID` = job.`id`
 LEFT JOIN Employee em ON er.`EMPLOYEE_ID` = em.`id` 
 WHERE job.`jobNo` = 2853 AND job.`OWNER_GUID` = 'b7c08a16-20c3-4062-9f64-26d1be2b6e21' 
 GROUP BY job.`jobNo`, `Employee`;
-
-
+```
+```
 INSERT INTO `Report_Entity` (`guid`, `name`, `uname`, `query`, `active`, `showIndexColumn`, `hierarchyColumn`, `createNewRowForHierarhcy`, `owner_id`, `OWNER_GUID`, `isStandalone`, `VIEW_PERMISSION_ID`, `VIEW_PERMISSION_GUID`)
 VALUES
     ('46e65716-f25c-11e7-a03c-bf121c5863e6', 'Employee Longevity Report', 'employee_longevity_report', '', 1, 0, NULL, 1, NULL, 'b7c08a16-20c3-4062-9f64-26d1be2b6e21', 1, NULL, NULL);
-
+```
+```
 INSERT INTO `Report_Entity_Parameter` (`guid`, `index`, `paramName`, `type`, `title`, `defaultOp`, `defaultVal`, `extra`, `extra2`, `extra3`, `extra4`, `positionInUI`, `requiresNewLine`, `VIEW_PERMISSION_GUID`, `owner_guid`)
 VALUES
     ('23275124-f25f-11e7-a03c-bf121c5863e6', 0, 'job', 'ComboBox', 'Job No.', '', '-1', 'SELECT \'All\' m_key, -1 m_value\n\nUNION\n\n(SELECT jobNo m_key, id m_value FROM JobOrder\nWHERE OWNER_GUID = \'b7c08a16-20c3-4062-9f64-26d1be2b6e21\'\nAND status NOT IN (\'Deleted\', \'Finished\'))\n\nORDER BY m_key DESC;', '', '', '', 'Left', 0, NULL, '46e65716-f25c-11e7-a03c-bf121c5863e6');
-
+```
+```
 INSERT INTO `Report_Entity_Parameter` (`guid`, `index`, `paramName`, `type`, `title`, `defaultOp`, `defaultVal`, `extra`, `extra2`, `extra3`, `extra4`, `positionInUI`, `requiresNewLine`, `VIEW_PERMISSION_GUID`, `owner_guid`)
 VALUES
     ('25288c04-f4cb-11e7-9358-b96beb5d0c26', 1, 'customer', 'CurrentCustomer', 'CurrentCustomer', '', '', '', '', '', '', 'None', 0, NULL, '46e65716-f25c-11e7-a03c-bf121c5863e6');
+```
 
-
-
-{
-    "customerUniqueIdentifier": "bcflynn",
-    "dtype": "ExportSet",
-    "exportItems": [{
-        "customerExportItemType": "REPORT_ENTITY_EXPORT",
-        "exportItemName": "Employee Longevity Report",
-        "itemGuid": "46e65716-f25c-11e7-a03c-bf121c5863e6",
-        "propertyMap": {
-            "reportEntity": {
-                "active": true,
-                "createNewRowForHierarchy": true,
-                "hierarchyColumn": null,
-                "isStandalone": true,
-                "name": "Employee Longevity Report",
-                "ownerGuid": "b7c08a16-20c3-4062-9f64-26d1be2b6e21",
-                "query": "SELECT job.jobNo AS `Job No.`, CONCAT(em.`firstName`, ' ', em.`lastName`) AS `Employee`, \nSUM(DATEDIFF(LEAST(COALESCE(er.`end_date`,CURDATE()), CURDATE()), LEAST(er.`start_date`, CURDATE()))) AS `Duration (Days)`  \nFROM EmployeeRecord er \nLEFT JOIN JobOrder job ON er.`JOB_ORDER_ID` = job.`id` \nLEFT JOIN Employee em ON er.`EMPLOYEE_ID` = em.`id` \nWHERE job.`id` = :jobId AND job.`OWNER_GUID` = :customer \nGROUP BY job.`jobNo`, `Employee`;",
-                "queryLines": [
-                    "SELECT job.jobNo AS `Job No.`, CONCAT(em.`firstName`, ' ', em.`lastName`) AS `Employee`, ",
-                    "SUM(DATEDIFF(LEAST(COALESCE(er.`end_date`,CURDATE()), CURDATE()), LEAST(er.`start_date`, CURDATE()))) AS `Duration (Days)`  ",
-                    "FROM EmployeeRecord er ",
-                    "LEFT JOIN JobOrder job ON er.`JOB_ORDER_ID` = job.`id` ",
-                    "LEFT JOIN Employee em ON er.`EMPLOYEE_ID` = em.`id` ",
-                    "WHERE job.`id` = :jobId AND job.`OWNER_GUID` = :customer ",
-                    "GROUP BY job.`jobNo`, `Employee`;"
-                ],
-                "reportEntityGuid": "46e65716-f25c-11e7-a03c-bf121c5863e6",
-                "showIndexColumn": false,
-                "uname": "employee_longevity_report",
-                "viewPermissionGuid": null
-            },
-            "reportEntityColumn": [],
-            "reportEntityParameter": [{
-                    "defaultOp": "",
-                    "defaultVal": "",
-                    "extra": "",
-                    "extra2": "",
-                    "extra3": "",
-                    "extra4": "",
-                    "index": 1,
-                    "ownerGuid": "46e65716-f25c-11e7-a03c-bf121c5863e6",
-                    "paramName": "customer",
-                    "positionInUI": "None",
-                    "reportEntityParameterGuid": "25288c04-f4cb-11e7-9358-b96beb5d0c26",
-                    "requiresNewLine": false,
-                    "title": "CurrentCustomer",
-                    "type": "CurrentCustomer",
-                    "viewPermissionGuid": null
-                },
-                {
-                    "defaultOp": "",
-                    "defaultVal": "-1",
-                    "extra": "SELECT jobNo m_key, id m_value FROM JobOrder\nWHERE OWNER_GUID = :field_ticketing_customer_guid \nAND status NOT IN ('Deleted', 'Finished') ORDER BY m_key DESC;",
-                    "extra2": "",
-                    "extra3": "",
-                    "extra4": "",
-                    "index": 0,
-                    "ownerGuid": "46e65716-f25c-11e7-a03c-bf121c5863e6",
-                    "paramName": "jobId",
-                    "positionInUI": "Left",
-                    "reportEntityParameterGuid": "23275124-f25f-11e7-a03c-bf121c5863e6",
-                    "requiresNewLine": false,
-                    "title": "Job No.",
-                    "type": "ComboBox",
-                    "viewPermissionGuid": null
-                }
-            ],
-            "reportEntityRowAction": [],
-            "reportEntityTableAction": []
-        }
-    }],
-    "version": "3.0"
-}
-
-
+```
 INSERT INTO `customer_shared_report` (`guid`, `CUSTOMER_GUID`, `REPORT_ENTITY_GUID`)
 VALUES
 	('5f7f9f14-f584-11e7-b739-3b15ba66d1e4', 'b7c08a16-20c3-4062-9f64-26d1be2b6e21', ‘46e65716-f25c-11e7-a03c-bf121c5863e6');
+```
 
 
-
-select UTC_TIMESTAMP();  // 2018-01-10 21:21:43
-
+### select UTC_TIMESTAMP();  // 2018-01-10 21:21:43
+```
 select er.`start_date` AS `start date`, er.end_date AS `end date`, CONCAT(em.`firstName`, ' ', em.`lastName`) AS `employee` from EmployeeRecord er JOIN Employee em ON er.`EMPLOYEE_ID` = em.`id` where er.`JOB_ORDER_ID` = ‘2121';
+```
 
-
-The difference between Procedure and Function in MySQL?
+### The difference between Procedure and Function in MySQL?
 
 The most general difference between procedures and functions is that they are invoked differently and for different purposes:
 	1.	A procedure does not return a value. Instead, it is invoked with a CALL statement to perform an operation such as modifying a table or processing retrieved records.
@@ -559,21 +495,27 @@ Syntax for routine creation differs somewhat for procedures and functions:
 	•	Specifying a parameter as IN, OUT, or INOUT is valid only for a PROCEDURE. For a FUNCTION, parameters are always regarded as IN parameters. 
 	3.	If no keyword is given before a parameter name, it is an IN parameter by default. Parameters for stored functions are not preceded by IN, OUT, or INOUT. All function parameters are treated as IN parameters. 
 To define a stored procedure or function, use CREATE PROCEDURE or CREATE FUNCTION respectively:
+```
 CREATE PROCEDURE proc_name ([parameters])
  [characteristics]
  routine_body
-
-
+```
+```
 CREATE FUNCTION func_name ([parameters])
  RETURNS data_type       // diffrent
  [characteristics]
  routine_body
+ ```
 A MySQL extension for stored procedure (not functions) is that a procedure can generate a result set, or even multiple result sets, which the caller processes the same way as the result of a SELECT statement. However, the contents of such result sets cannot be used directly in expression.
+
 Stored routines (referring to both stored procedures and stored functions) are associated with a particular database, just like tables or views. When you drop a database, any stored routines in the database are also dropped.
 Stored procedures and functions do not share the same namespace. It is possible to have a procedure and a function with the same name in a database.
+
 In Stored procedures dynamic SQL can be used but not in functions or triggers.
+
 SQL prepared statements (PREPARE, EXECUTE, DEALLOCATE PREPARE) can be used in stored procedures, but not stored functions or triggers. Thus, stored functions and triggers cannot use Dynamic SQL (where you construct statements as strings and then execute them). (Dynamic SQL in MySQL stored routines)
-Some more interesting differences between FUNCTION and STORED PROCEDURE:
+
+### Some more interesting differences between FUNCTION and STORED PROCEDURE:
 	1.	(This point is copied from a blogpost.) Stored procedure is precompiled execution plan where as functions are not. Function Parsed and compiled at runtime. Stored procedures, Stored as a pseudo-code in database i.e. compiled form. 
 	2.	(I'm not sure for this point.) Stored procedure has the security and reduces the network traffic and also we can call stored procedure in any no. of applications at a time. reference 
 	3.	Functions are normally used for computations where as procedures are normally used for executing business logic. 
@@ -581,9 +523,10 @@ Some more interesting differences between FUNCTION and STORED PROCEDURE:
 	5.	Functions can't use FLUSH statements whereas Stored procedures can do. 
 	6.	Stored functions cannot be recursive Whereas Stored procedures can be. Note: Recursive stored procedures are disabled by default, but can be enabled on the server by setting the max_sp_recursion_depth server system variable to a nonzero value. See Section 5.2.3, “System Variables”, for more information. 
 	7.	Within a stored function or trigger, it is not permitted to modify a table that is already being used (for reading or writing) by the statement that invoked the function or trigger. Good Example: How to Update same table on deletion in MYSQL? 
+	
 Note: that although some restrictions normally apply to stored functions and triggers but not to stored procedures, those restrictions do apply to stored procedures if they are invoked from within a stored function or trigger. For example, although you can use FLUSH in a stored procedure, such a stored procedure cannot be called from a stored function or trigger.
 
-
+```
 DELIMITER //
 
 CREATE FUNCTION IncomeLevel ( monthly_value INT )
@@ -609,8 +552,8 @@ BEGIN
 END; //
 
 DELIMITER ;
-
-
+```
+```
 SELECT job.jobNo AS `Job No.`, CONCAT(em.`firstName`, ' ', em.`lastName`) AS `Employee`, 
 SUM(DurationDaysCalculator(er.`start_date`, er.`end_date`, cus.`timezone`)) AS `Duration (Days)`  
 FROM EmployeeRecord er 
@@ -620,8 +563,8 @@ JOIN Customer cus ON job.`OWNER_GUID` = cus.`guid`
 WHERE job.`id` = :jobId AND job.`OWNER_GUID` = :customer 
 GROUP BY job.`jobNo`, `Employee` 
 ORDER BY `Employee`;
-
-
+```
+```
 DROP FUNCTION IF EXISTS DurationDaysCalculator;
 
 DELIMITER //
@@ -656,13 +599,14 @@ CREATE FUNCTION DurationDaysCalculator(start_date TIMESTAMP, end_date TIMESTAMP,
 //
 
 DELIMITER ;
+```
 
-
+### some git stash
 git stash list [<options>]
 git stash show [<stash>]
 git stash drop [-q|--quiet] [<stash>]
 
-
+### Java DateFormat styles:
 The preceding code example specified the DEFAULT formatting style. The DEFAULT style is just one of the predefined formatting styles that the DateFormat class provides, as follows:
 	•	DEFAULT
 	•	SHORT
@@ -672,12 +616,7 @@ The preceding code example specified the DEFAULT formatting style. The DEFAUL
 The following table shows how dates are formatted for each style with the U.S. and French locales:
 Sample Date Formats
 
-
-
 dateFormatter = DateFormat.getDateInstance(DateFormat.DEFAULT, currentLocale);
-
-
-
 
 
 
@@ -685,13 +624,14 @@ certificateListComboBox.setCaption(
                 "<font size=\"5\">Please choose a certificate that you would like to submit:</font>");
         certificateListComboBox.setCaptionAsHtml(true);
 
+```
 select MAX(cd.`updated_at`), cd.`guid`, cd.`CERTIFICATION_TYPE_GUID`, cd.`status` from certification_data cd WHERE cd.`CREATED_BY_ID` = 392   GROUP BY cd.`CERTIFICATION_TYPE_GUID`;
 select cd.* from certification_data cd WHERE cd.`CREATED_BY_ID` = 392  AND cd.`updated_at` = (SELECT max(cd2.`updated_at`) from certification_data cd2 where cd2.`CREATED_BY_ID` = 392 AND cd2.`CERTIFICATION_TYPE_GUID` = cd.`CERTIFICATION_TYPE_GUID` group by cd2.`CERTIFICATION_TYPE_GUID`) ;
 
 select cd.* from certification_data cd WHERE cd.`CREATED_BY_ID` = 392  AND cd.`updated_at` = (SELECT max(cd2.`updated_at`) from certification_data cd2 where cd2.`CREATED_BY_ID` = 392 AND cd2.`CERTIFICATION_TYPE_GUID` = cd.`CERTIFICATION_TYPE_GUID` group by cd2.`CERTIFICATION_TYPE_GUID`) AND cd.`status` = ‘Certified';
+```
 
-
-
+```
 /**
      * Gets the certification data for certification types of the given employee. If
      * certificationDataStatusList is not null, will only select the ones with certain CertificationDataStatus.
@@ -718,12 +658,15 @@ select cd.* from certification_data cd WHERE cd.`CREATED_BY_ID` = 392  AND cd.`u
         }
         return new ArrayList<>();
     }
-
+```
+```
 SELECT c FROM com.invistaware.compliance.model.CertificationData c WHERE c.createdBy.id = :CREATED_BY_ID AND c.updatedAt = (SELECT MAX(cd2.updatedAt) FROM com.invistaware.compliance.model.CertificationData cd2 WHERE cd2.createdBy.id = :CREATED_BY_ID AND cd2.certificationType.guid = c.certificationType.guid GROUP BY cd2.certificationType.guid) AND c.status IN (‘CERTIFIED’);
+```
 
-How To Order Null Values First Or Last In Mysql?
+### How To Order Null Values First Or Last In Mysql?
 https://www.designcise.com/web/tutorial/how-to-order-null-values-first-or-last-in-mysql
 
+```
 -- Certified certs
 SELECT ct.name `Certificate Name`, CONCAT(e.firstName, ' ', e.lastName) `Employee`,
 IF(ct.Type IS NULL or LENGTH(ct.Type) < 2, ct.Type, CONCAT(UCASE(LEFT(ct.Type, 1)), LCASE(SUBSTRING(ct.Type, 2)))) `Type`,
@@ -771,15 +714,16 @@ WHERE cd.status = 'CERTIFIED'
 GROUP BY cd.guid
 
 ORDER BY -`Expires On` DESC, ct.name ASC;
+```
 
-
+```
 INSERT INTO `Report_Entity` (`guid`, `name`, `uname`, `query`, `active`, `showIndexColumn`, `hierarchyColumn`, `createNewRowForHierarhcy`, `owner_id`, `OWNER_GUID`, `isStandalone`, `VIEW_PERMISSION_ID`, `VIEW_PERMISSION_GUID`)
 VALUES
 	('249793b4-d6a1-11e6-ab5d-c474fb8ccc58', 'Certification Certified Report', NULL, '-- Certified certs\nSELECT ct.name `Certificate Name`, CONCAT(e.firstName, \' \', e.lastName) `Employee`,\nIF(ct.Type IS NULL or LENGTH(ct.Type) < 2, ct.Type, CONCAT(UCASE(LEFT(ct.Type, 1)), LCASE(SUBSTRING(ct.Type, 2)))) `Type`,\nDATE_FORMAT(CONVERT_TZ(cd.`reviewed_at`, \'UTC\', cu.timezone), \'%Y-%m-%d\') `Certified On`,\n-- Expires On field is based on CertificationData.getEffectiveExpirationDate method\nDATE_FORMAT(\n  CONVERT_TZ(\n    GET_COMPLIANCE_CERTIFICATION_EXPIRATION_DATE(ct.`expiration_type`, ct.`expiration_date`, ct.`expiration_num_of_days_after_certified`\n      , cd.`certified_date`, cd.`expiration_date`),\n    \'UTC\', cu.timezone)\n  ,\'%Y-%m-%d\') `Expires On`,\nct.guid `certTypeGuid`, cd.guid`certDataGuid`, e.`id` `employeeId`\n\nFROM certification_type ct\n  LEFT JOIN Customer cu ON (ct.CUSTOMER_GUID = cu.`guid`)\n  LEFT JOIN certification_data cd ON (ct.guid = cd.CERTIFICATION_TYPE_GUID)\n  LEFT JOIN Employee e ON (cd.CREATED_BY_ID = e.LINKED_USER_ID)\n  LEFT JOIN certification_type_trades cts ON (ct.guid = cts.CERTIFICATION_TYPE_GUID)\n  LEFT JOIN certification_type_clients ctc ON (ct.guid = ctc.CERTIFICATION_TYPE_GUID)\n  LEFT JOIN certification_type_areas cta ON (ct.guid = cta.CERTIFICATION_TYPE_GUID)\n  LEFT JOIN certification_type_jobs ctj ON (ct.guid = ctj.CERTIFICATION_TYPE_GUID)\n\nWHERE cd.status = \'CERTIFIED\'\n  AND (cd.is_expired = 0)\n  AND (ct.is_active = 1)\n  AND (ct.is_deleted = 0)\n  AND ct.CUSTOMER_GUID = :customer\n\n  -- Report Parameters\n	AND (ct.GUID like :CERT_TYPE_GUID)\n	AND (-1 = :EMPLOYEE_ID OR e.ID = :EMPLOYEE_ID)\n 	AND (-1 = :TRADE_ID OR (cts.TRADE_ID = :TRADE_ID AND e.JOB_ITEM_ID = cts.TRADE_ID))\n	AND (-1 = :LOCATION_ID OR (cta.LOCATION_ID = :LOCATION_ID\n							AND EXISTS (SELECT * FROM employee_areas ea\n										WHERE ea.`EMPLOYEE_ID` = e.id AND ea.`LOCATION_ID` = cta.`LOCATION_ID`)))\n	AND (-1 = :CLIENT_ID OR (ctc.CLIENT_ID = :CLIENT_ID\n							AND EXISTS (SELECT * FROM EmployeeRecord ecr\n												JOIN JobOrder j ON (ecr.JOB_ORDER_ID = j.id)\n										WHERE ecr.`EMPLOYEE_ID` = e.id AND j.`client_id` = ctc.CLIENT_ID)))\n	AND ((0 = :EXPIRY_IN_DAYS AND (GET_COMPLIANCE_CERTIFICATION_EXPIRATION_DATE(ct.`expiration_type`, ct.`expiration_date`, ct.`expiration_num_of_days_after_certified`, cd.`certified_date`, cd.`expiration_date`) > now() OR GET_COMPLIANCE_CERTIFICATION_EXPIRATION_DATE(ct.`expiration_type`, ct.`expiration_date`, ct.`expiration_num_of_days_after_certified`, cd.`certified_date`, cd.`expiration_date`) IS NULL)) \n    OR ( 0 <> :EXPIRY_IN_DAYS AND\n		  GET_COMPLIANCE_CERTIFICATION_EXPIRATION_DATE(ct.`expiration_type`, ct.`expiration_date`, ct.`expiration_num_of_days_after_certified`, cd.`certified_date`, cd.`expiration_date`) BETWEEN now() AND DATE_ADD(now(), INTERVAL :EXPIRY_IN_DAYS DAY)))\n\n-- remove duplicate results\nGROUP BY cd.guid\n\nORDER BY -`Expires On` DESC, ct.name ASC;', 1, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL);
+```
 
 
-
-
+```
 -- Certified certs
 SELECT ct.name `Certificate Name`, CONCAT(e.firstName, ' ', e.lastName) `Employee`,
 IF(ct.Type IS NULL or LENGTH(ct.Type) < 2, ct.Type, CONCAT(UCASE(LEFT(ct.Type, 1)), LCASE(SUBSTRING(ct.Type, 2)))) `Type`,
@@ -828,5 +772,5 @@ GROUP BY cd.guid
 
 -- order the rows based on effective expiration date, if the date is null, put it at the bottom, and then order the rows with null expiration date by the cert type name alphabetically
 ORDER BY ISNULL(`Expires On`) ASC, `Expires On` ASC, ct.name ASC;
-
+```
 
