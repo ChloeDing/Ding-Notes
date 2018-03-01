@@ -836,3 +836,12 @@ System.out.println("UTC:     " + simpleDateFormat.format(calendar.getTime()));
 System.out.println("Default: " + calendar.getTime());
 ```
 
+### Sorting List
+```
+List<JobOrder> jobOrders = new ArrayList<>();
+jobOrders.addAll(jobBoardModelFacade.getAllOpenJobsAsNonManaged(customer, view.getSelectedDate()));
+Collections.sort(jobOrders, Comparator.comparing(JobOrder::getJobNo, String.CASE_INSENSITIVE_ORDER));
+```
+
+`jobOrders` is now sorted based on the JobNo and case-insensitive and alphabetically!
+
