@@ -845,3 +845,40 @@ Collections.sort(jobOrders, Comparator.comparing(JobOrder::getJobNo, String.CASE
 
 `jobOrders` is now sorted based on the JobNo and case-insensitive and alphabetically!
 
+### Alternate row colors in javascript table
+Here is the pure css version,
+```
+table tr:nth-child(odd) td{
+}
+table tr:nth-child(even) td{
+}
+```
+And here is the jQuery solution for the same,
+```
+$(function(){
+   $("table tr:even").addClass("evenClassName");
+   $("table tr:odd").addClass("oddClassName");
+});
+```
+Here is the pure JavaScript solution,
+```
+function altrows(firstcolor,secondcolor)
+{
+    var tableElements = document.getElementsByTagName("table") ;
+    for(var j = 0; j < tableElements.length; j++)
+    {
+        var table = tableElements[j] ;
+
+        var rows = table.getElementsByTagName("tr") ;
+        for(var i = 0; i <= rows.length; i++)
+        {
+            if(i%2==0){
+                rows[i].style.backgroundColor = firstcolor ;
+            }
+            else{
+                rows[i].style.backgroundColor = secondcolor ;
+            }
+        }
+    }
+}
+```
